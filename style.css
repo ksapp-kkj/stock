@@ -1,0 +1,131 @@
+:root {
+    --primary: #4a90e2;
+    --danger: #e53e3e;
+    --bg: #f0f2f5;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg);
+    margin: 0;
+    padding: 15px;
+    font-size: 16px; /* スマホでズームされないためのサイズ */
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 { text-align: center; color: #333; font-size: 1.5rem; }
+
+/* 入力エリア */
+.input-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.input-card input, .input-card select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.input-row select { flex: 2; }
+.input-row input { flex: 1; }
+#addBtn {
+    flex: 1.5;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* カテゴリーアコーディオン */
+.category-section {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.category-header {
+    background: #fff;
+    padding: 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.category-header::after {
+    content: '▼';
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+}
+
+.category-section.open .category-header::after {
+    transform: rotate(180deg);
+}
+
+.category-content {
+    display: none;
+    padding: 0 15px;
+}
+
+.category-section.open .category-content {
+    display: block;
+}
+
+/* リストアイテム */
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #fafafa;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-count {
+    width: 40px; /* スマホ用に大きく */
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 1.2rem;
+}
+
+.low-stock { color: var(--danger); font-weight: bold; }
+
+/* 通知エリア */
+.alert-box {
+    background: #fff5f5;
+    color: var(--danger);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 5px solid var(--danger);
+}

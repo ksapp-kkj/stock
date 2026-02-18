@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📦 在庫管理</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>📦 在庫管理</h1>
+
+    <div id="alertArea"></div>
+
+    <div class="input-card">
+        <input type="text" id="itemName" placeholder="商品名">
+        <div class="input-row">
+            <select id="itemCategory">
+                <option value="キッチン">キッチン</option>
+                <option value="バスルーム">バスルーム</option>
+                <option value="ランドリー">ランドリー</option>
+                <option value="トイレ">トイレ</option>
+                <option value="消耗品">消耗品</option>
+            </select>
+            <input type="number" id="itemCount" value="3" min="0">
+            <button id="addBtn">追加</button>
+        </div>
+    </div>
+
+    <div id="categoryContainer"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
