@@ -9,7 +9,10 @@
 <body>
 
 <div class="container">
-    <h1>📦 在庫管理</h1>
+    <header class="main-header">
+        <h1>📦 在庫管理</h1>
+        <button id="settingsBtn" class="icon-btn" aria-label="設定">⚙️</button>
+    </header>
 
     <div id="alertArea"></div>
 
@@ -17,18 +20,40 @@
         <input type="text" id="itemName" placeholder="商品名">
         <div class="input-row">
             <select id="itemCategory">
-                <option value="キッチン">キッチン</option>
-                <option value="バスルーム">バスルーム</option>
-                <option value="ランドリー">ランドリー</option>
-                <option value="トイレ">トイレ</option>
-                <option value="消耗品">消耗品</option>
-            </select>
+                </select>
+            
+            <div class="threshold-container">
+                <span class="input-label-mini">目安</span>
+                <input type="number" id="itemThreshold" value="1" min="1">
+            </div>
+
             <input type="number" id="itemCount" value="3" min="0">
             <button id="addBtn">追加</button>
+        </div>
+        
+        <div class="admin-links">
+            <button onclick="manageCategories()" class="btn-text">カテゴリー編集</button>
         </div>
     </div>
 
     <div id="categoryContainer"></div>
+</div>
+
+<div id="settingsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚙️ 設定</h2>
+            <button id="closeSettings" class="close-btn">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <section class="settings-section">
+                <h3>カテゴリー管理</h3>
+                <div id="categoryEditList"></div>
+                <button onclick="addNewCategory()" class="add-cat-btn">+ 新しいカテゴリー</button>
+            </section>
+        </div>
+    </div>
 </div>
 
 <script src="script.js"></script>
