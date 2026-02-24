@@ -1,15 +1,26 @@
-// --- データの初期化 ---
+// --- データの初期値 ---
 let inventory = JSON.parse(localStorage.getItem('myInventory')) || [];
 let openCategories = JSON.parse(localStorage.getItem('openCategories')) || ["キッチン"];
 let categories = JSON.parse(localStorage.getItem('myCategories')) || ["キッチン", "バスルーム", "ランドリー", "トイレ", "消耗品"];
 
-// 要素の取得
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsModal = document.getElementById('settingsModal');
-const closeSettings = document.getElementById('closeSettings');
-const categoryEditList = document.getElementById('categoryEditList');
+const changeLogs = [
+    { date: "2024.05.20", text: "📄 変更履歴の確認機能を追加しました。" },
+    { date: "2024.05.19", text: "⚙️ 設定画面をモーダル化し、カテゴリーの改名・削除に対応。" },
+    { date: "2024.05.18", text: "📦 商品ごとに「目安（基準在庫）」を設定できる機能を追加。" },
+    { date: "2024.05.17", text: "🚀 在庫管理アプリを GitHub で公開しました。" }
+];
 
-// --- アプリ全体の更新・保存 ---
+// --- 要素の取得 ---
+const settingsBtn = document.getElementById('settingsBtn');
+const historyBtn = document.getElementById('historyBtn');
+const settingsModal = document.getElementById('settingsModal');
+const historyModal = document.getElementById('historyModal');
+const closeSettings = document.getElementById('closeSettings');
+const closeHistory = document.getElementById('closeHistory');
+const categoryEditList = document.getElementById('categoryEditList');
+const historyList = document.getElementById('historyList');
+
+// --- 保存・同期 ---
 function updateApp() {
     localStorage.setItem('myInventory', JSON.stringify(inventory));
     localStorage.setItem('openCategories', JSON.stringify(openCategories));
@@ -17,45 +28,36 @@ function updateApp() {
     render();
 }
 
-// --- 描画処理（メイン画面） ---
+// --- メイン描画 ---
 function render() {
     renderAlerts();
-    renderCategorySelect(); 
-    renderCategories();     
+    renderCategorySelect();
+    renderCategories();
 }
 
 function renderAlerts() {
     const alertArea = document.getElementById('alertArea');
     const lowItems = inventory.filter(i => i.count <= (i.threshold || 1));
-    if (lowItems.length > 0) {
-        alertArea.innerHTML = `<div class="alert-box">⚠️ 不足：${lowItems.map(i => i.name).join(', ')}</div>`;
-    } else {
-        alertArea.innerHTML = '';
-    }
+    alertArea.innerHTML = lowItems.length > 0 ? 
+        `<div class="alert-box">⚠️ 不足：${lowItems.map(i => i.name).join(', ')}</div>` : '';
 }
 
 function renderCategorySelect() {
     const select = document.getElementById('itemCategory');
-    if (!select) return;
-    select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+    if (select) select.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
 }
 
 function renderCategories() {
     const container = document.getElementById('categoryContainer');
     container.innerHTML = '';
-
     categories.forEach(cat => {
         const items = inventory.filter(i => i.category === cat);
         if (items.length === 0) return;
-
         const isOpen = openCategories.includes(cat);
         const section = document.createElement('div');
         section.className = `category-section ${isOpen ? 'open' : ''}`;
-        
         section.innerHTML = `
-            <div class="category-header" onclick="toggleCategory('${cat}')">
-                ${cat} (${items.length})
-            </div>
+            <div class="category-header" onclick="toggleCategory('${cat}')">${cat} (${items.length})</div>
             <div class="category-content">
                 ${items.map(item => {
                     const idx = inventory.indexOf(item);
@@ -74,15 +76,41 @@ function renderCategories() {
                         </div>
                     </div>`;
                 }).join('')}
-            </div>
-        `;
+            </div>`;
         container.appendChild(section);
     });
 }
 
-// --- 設定モーダル内の描画・操作 ---
+// --- 操作ハンドラ ---
+window.toggleCategory = (cat) => {
+    openCategories = openCategories.includes(cat) ? openCategories.filter(c => c !== cat) : [...openCategories, cat];
+    updateApp();
+};
 
-// カテゴリー編集リストの描画
+window.addItem = () => {
+    const name = document.getElementById('itemName').value.trim();
+    const cat = document.getElementById('itemCategory').value;
+    const count = parseInt(document.getElementById('itemCount').value);
+    const threshold = parseInt(document.getElementById('itemThreshold').value) || 1;
+    if (name) {
+        inventory.push({ name, category: cat, count, threshold });
+        document.getElementById('itemName').value = '';
+        if (!openCategories.includes(cat)) openCategories.push(cat);
+        updateApp();
+    }
+};
+
+window.changeCount = (idx, delta) => {
+    if (inventory[idx]) {
+        inventory[idx].count += delta;
+        if (inventory[idx].count < 0) inventory[idx].count = 0;
+        updateApp();
+    }
+};
+
+window.removeItem = (idx) => { if (confirm('削除しますか？')) { inventory.splice(idx, 1); updateApp(); } };
+
+// --- モーダル内操作 ---
 function renderCategoryEditor() {
     categoryEditList.innerHTML = categories.map(cat => `
         <div class="item-row" style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:8px; border:none;">
@@ -91,104 +119,45 @@ function renderCategoryEditor() {
                 <button onclick="renameCategory('${cat}')" style="color:var(--primary); border:none; background:none; font-size:0.8rem;">改名</button>
                 <button onclick="deleteCategory('${cat}')" style="color:var(--danger); border:none; background:none; font-size:0.8rem; margin-left:10px;">削除</button>
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
 }
 
-// 新規カテゴリー追加
-window.addNewCategory = function() {
-    const name = prompt("新しいカテゴリー名を入力してください");
-    if (name && !categories.includes(name)) {
-        categories.push(name);
-        updateApp();
-        renderCategoryEditor();
-    }
+window.addNewCategory = () => {
+    const name = prompt("新しいカテゴリー名");
+    if (name && !categories.includes(name)) { categories.push(name); updateApp(); renderCategoryEditor(); }
 };
 
-// カテゴリー名の変更
-window.renameCategory = function(oldName) {
+window.renameCategory = (oldName) => {
     const newName = prompt(`${oldName} を何に変更しますか？`);
     if (newName && newName !== oldName) {
-        // 在庫データのカテゴリー名も一括更新
         inventory.forEach(i => { if (i.category === oldName) i.category = newName; });
         categories = categories.map(c => c === oldName ? newName : c);
-        updateApp();
-        renderCategoryEditor();
+        updateApp(); renderCategoryEditor();
     }
 };
 
-// カテゴリーの削除
-window.deleteCategory = function(cat) {
-    if (confirm(`カテゴリー「${cat}」を削除しますか？\n※このカテゴリー内の商品は削除されません（未分類になります）。`)) {
+window.deleteCategory = (cat) => {
+    if (confirm(`${cat} を削除しますか？`)) {
         inventory.forEach(i => { if (i.category === cat) i.category = "未分類"; });
         if (!categories.includes("未分類")) categories.push("未分類");
         categories = categories.filter(c => c !== cat);
-        updateApp();
-        renderCategoryEditor();
+        updateApp(); renderCategoryEditor();
     }
 };
 
-// --- イベントハンドラ（メイン画面用） ---
-
-window.toggleCategory = function(cat) {
-    if (openCategories.includes(cat)) {
-        openCategories = openCategories.filter(c => c !== cat);
-    } else {
-        openCategories.push(cat);
-    }
-    updateApp();
-};
-
-window.addItem = function() {
-    const nameEl = document.getElementById('itemName');
-    const catEl = document.getElementById('itemCategory');
-    const countEl = document.getElementById('itemCount');
-    const thresholdEl = document.getElementById('itemThreshold');
-    
-    if (nameEl.value.trim()) {
-        inventory.push({ 
-            name: nameEl.value.trim(), 
-            category: catEl.value, 
-            count: parseInt(countEl.value),
-            threshold: parseInt(thresholdEl.value) || 1
-        });
-        nameEl.value = '';
-        thresholdEl.value = '1';
-        if (!openCategories.includes(catEl.value)) openCategories.push(catEl.value);
-        updateApp();
-    }
-};
-
-window.changeCount = function(idx, delta) {
-    if (inventory[idx]) {
-        inventory[idx].count += delta;
-        if (inventory[idx].count < 0) inventory[idx].count = 0;
-        updateApp();
-    }
-};
-
-window.removeItem = function(idx) {
-    if (confirm('削除しますか？')) {
-        inventory.splice(idx, 1);
-        updateApp();
-    }
-};
-
-// --- モーダル制御 ---
-
-settingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'flex';
-    renderCategoryEditor();
+// --- モーダル制御イベント ---
+settingsBtn.addEventListener('click', () => { settingsModal.style.display = 'flex'; renderCategoryEditor(); });
+historyBtn.addEventListener('click', () => {
+    historyList.innerHTML = changeLogs.map(log => `<div class="history-item"><span class="history-date">${log.date}</span><div class="history-text">${log.text}</div></div>`).join('');
+    historyModal.style.display = 'flex';
 });
 
-closeSettings.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-});
-
+closeSettings.addEventListener('click', () => settingsModal.style.display = 'none');
+closeHistory.addEventListener('click', () => historyModal.style.display = 'none');
 window.addEventListener('click', (e) => {
     if (e.target === settingsModal) settingsModal.style.display = 'none';
+    if (e.target === historyModal) historyModal.style.display = 'none';
 });
 
-// --- 初期実行 ---
 document.getElementById('addBtn').addEventListener('click', addItem);
 render();
