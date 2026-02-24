@@ -5,7 +5,7 @@ let categories = JSON.parse(localStorage.getItem('myCategories')) || ["キッチ
 
 const changeLogs = [
     { date: "2026.02.24", text: "変更履歴の確認機能を追加。" },
-    { date: "2026.02.20", text: "設定画面をモーダル化し、カテゴリーの改名・削除に対応。" },
+    { date: "2026.02.20", text: "設定画面をモーダル化し、カテゴリーの名称変更・削除に対応。" },
     { date: "2026.02.19", text: "商品ごとに「基準在庫」を設定できる機能を追加。" },
     { date: "2026.02.18", text: "在庫管理アプリを GitHub で公開しました。" }
 ];
@@ -116,7 +116,7 @@ function renderCategoryEditor() {
         <div class="item-row" style="background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:8px; border:none;">
             <span>${cat}</span>
             <div class="controls">
-                <button onclick="renameCategory('${cat}')" style="color:var(--primary); border:none; background:none; font-size:0.8rem;">改名</button>
+                <button onclick="renameCategory('${cat}')" style="color:var(--primary); border:none; background:none; font-size:0.8rem;">名称変更</button>
                 <button onclick="deleteCategory('${cat}')" style="color:var(--danger); border:none; background:none; font-size:0.8rem; margin-left:10px;">削除</button>
             </div>
         </div>`).join('');
