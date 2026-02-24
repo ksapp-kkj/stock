@@ -4,10 +4,10 @@ let openCategories = JSON.parse(localStorage.getItem('openCategories')) || ["キ
 let categories = JSON.parse(localStorage.getItem('myCategories')) || ["キッチン", "バスルーム", "ランドリー", "トイレ", "消耗品"];
 
 const changeLogs = [
-    { date: "2024.05.20", text: "📄 変更履歴の確認機能を追加しました。" },
-    { date: "2024.05.19", text: "⚙️ 設定画面をモーダル化し、カテゴリーの改名・削除に対応。" },
-    { date: "2024.05.18", text: "📦 商品ごとに「目安（基準在庫）」を設定できる機能を追加。" },
-    { date: "2024.05.17", text: "🚀 在庫管理アプリを GitHub で公開しました。" }
+    { date: "2026.02.24", text: "変更履歴の確認機能を追加。" },
+    { date: "2026.02.20", text: "設定画面をモーダル化し、カテゴリーの改名・削除に対応。" },
+    { date: "2026.02.19", text: "商品ごとに「基準在庫」を設定できる機能を追加。" },
+    { date: "2026.02.18", text: "在庫管理アプリを GitHub で公開しました。" }
 ];
 
 // --- 要素の取得 ---
@@ -66,7 +66,7 @@ function renderCategories() {
                     <div class="item-row">
                         <div class="item-main">
                             <span class="${isLow ? 'low-stock' : ''}">${item.name}</span>
-                            <span class="threshold-info">目安: ${item.threshold || 1}</span>
+                            <span class="threshold-info">基準在庫: ${item.threshold || 1}</span>
                         </div>
                         <div class="controls">
                             <button class="btn-count" onclick="changeCount(${idx}, -1)">-</button>
